@@ -34,22 +34,25 @@ if [[ "${REBUILD_IMAGE}" == "1" ]]; then
         --file ${tmpdir}/Dockerfile \
         ${workspace_dir}/backstage-showcase
     docker push ${image_url_full}
-else
+elif [[ "${COPY_IMAGE}" == "1" ]]; then
     skopeo copy docker://${upstream_image_url} docker://${image_url_full}
 fi
 
 ## TODO: test further, fix image and avoid this
-oc adm policy add-scc-to-user --serviceaccount=default nonroot-v2
+# oc adm policy add-scc-to-user --serviceaccount=default nonroot-v2
+oc adm policy add-scc-to-user --serviceaccount=default privileged
 oc adm policy add-cluster-role-to-user --serviceaccount=default view
 
 echo "INFO: apply resources from ${this_dir}/base/*.yaml"
 for file in $(ls ${this_dir}/base/*.yaml); do
+    ## hack: exclude files that have been entirely commented out
     lines=$(cat ${file} | awk '/^[^#].*$/ {print}' | wc -l)
     if [[ ${lines} > 0 ]]; then
         cat ${file} | envsubst '${bs_app_name} ${ARGOCD_AUTH_TOKEN} ${GITHUB_TOKEN} ${QUAY_TOKEN} ${registry_hostname}' | kubectl apply -f -
     fi
 done
 
+## apply custom app-config.yaml from this dir
 file_path=${this_dir}/app-config.yaml
 if [[ -e "${file_path}" ]]; then
     echo "INFO: applying appconfig configmap from ${file_path}"
@@ -94,8 +97,11 @@ for file in $(ls ${this_dir}/chart-values/*.yaml.tpl); do
 done
 
 echo "INFO: using chart values flags: ${chart_values}"
-helm upgrade --install rhdh janus/backstage ${chart_values}
+helm upgrade --install ${bs_app_name} janus/backstage ${chart_values}
 
-oc rollout restart deployment backstage
+## HACK: patch out custom app-config installed by Janus intermediate chart
+oc patch configmap ${bs_app_name}-backstage-app-config -p "{\"data\": { \"app-config.yaml\": \"{}\" }}"
+
+oc rollout restart deployment ${bs_app_name}-backstage
 
 echo "INFO: Visit your Backstage instance at https://backstage-${bs_app_name}.${openshift_ingress_domain}/"

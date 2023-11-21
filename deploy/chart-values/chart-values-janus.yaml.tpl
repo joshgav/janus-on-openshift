@@ -16,7 +16,7 @@ global:
     plugins: []
 
   # -- Shorthand for users who do not want to specify a custom HOSTNAME. Used ONLY with the DEFAULT upstream.backstage.appConfig value and with OCP Route enabled.
-  clusterRouterBase: apps.example.com
+  # clusterRouterBase: apps.example.com
   # -- Custom hostname shorthand, overrides `global.clusterRouterBase`, `upstream.ingress.host`, `route.host`, and url values in `upstream.backstage.appConfig`
   host: backstage-${bs_app_name}.${openshift_ingress_domain}
   # -- Enable service authentication within Backstage instance
@@ -25,20 +25,12 @@ global:
     # <br /> Ref: https://backstage.io/docs/auth/service-to-service-auth/
     backend:
       # -- Enable backend service to service authentication, unless configured otherwise it generates a secret value
-      enabled: true
+      enabled: false
       # -- Instead of generating a secret value, refer to existing secret
-      existingSecret: ""
+      # existingSecret: ""
       # -- Instead of generating a secret value, use following value
-      value: "replacewithbase64secret"
+      # value: "replacewithbase64secret"
 
 # -- OpenShift Route parameters
 route:
-  annotations: {}
   enabled: true
-  host: "{{ .Values.global.host }}"
-  path: "/"
-  wildcardPolicy: None
-  tls:
-    enabled: true
-    termination: "edge"
-    insecureEdgeTerminationPolicy: "Redirect"
