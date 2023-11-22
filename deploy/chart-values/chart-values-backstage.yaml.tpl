@@ -85,7 +85,7 @@ upstream:
         scheme: HTTP
       initialDelaySeconds: 30
       periodSeconds: 10
-      successThreshold: 2
+      successThreshold: 1
       timeoutSeconds: 2
     livenessProbe:
       failureThreshold: 3

@@ -18,53 +18,25 @@ global:
     # an optional `pluginConfig` with plugin-specific backstage configuration, and an optional `disabled` flag to disable/enable a plugin
     # listed in `includes` files. It also includes an `integrity` field that is used to verify the plugin package [integrity](https://w3c.github.io/webappsec-subresource-integrity/#integrity-metadata-description).
     plugins:
+    # Techdocs
+    - package: ./dynamic-plugins/dist/backstage-plugin-techdocs
+      disabled: false
+    - package: ./dynamic-plugins/dist/backstage-plugin-techdocs-backend-dynamic
+      disabled: false
+    - package: ./dynamic-plugins/dist/janus-idp-backstage-plugin-quay
+      disabled: false
+    - package: ./dynamic-plugins/dist/janus-idp-backstage-plugin-tekton
+      disabled: false
     - package: ./dynamic-plugins/dist/roadiehq-backstage-plugin-argo-cd-backend-dynamic
       disabled: false
     - package: ./dynamic-plugins/dist/roadiehq-scaffolder-backend-argocd-dynamic
       disabled: false
     - package: ./dynamic-plugins/dist/roadiehq-backstage-plugin-argo-cd
       disabled: false
-      pluginConfig:
-        dynamicPlugins:
-          frontend:
-            roadiehq.backstage-plugin-argo-cd:
-              mountPoints:
-                - mountPoint: entity.page.overview/cards
-                  importName: EntityArgoCDOverviewCard
-                  config:
-                    layout:
-                      gridColumnEnd:
-                        lg: "span 8"
-                        xs: "span 12"
-                    if:
-                      allOf:
-                        - isArgocdAvailable
-                - mountPoint: entity.page.cd/cards
-                  importName: EntityArgoCDHistoryCard
-                  config:
-                    layout:
-                      gridColumn: "1 / -1"
-                    if:
-                      allOf:
-                        - isArgocdAvailable
     - package: ./dynamic-plugins/dist/backstage-plugin-kubernetes-backend-dynamic
       disabled: false
     - package: ./dynamic-plugins/dist/backstage-plugin-kubernetes
       disabled: false
-      pluginConfig:
-        dynamicPlugins:
-          frontend:
-            backstage.plugin-kubernetes:
-              mountPoints:
-                - mountPoint: entity.page.kubernetes/cards
-                  importName: EntityKubernetesContent
-                  config:
-                    layout:
-                      gridColumn: "1 / -1"
-                    if:
-                      anyOf:
-                        - hasAnnotation: backstage.io/kubernetes-id
-                        - hasAnnotation: backstage.io/kubernetes-namespace
 
   # -- Enable service authentication within Backstage instance
   auth:

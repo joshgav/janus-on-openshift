@@ -73,26 +73,6 @@ proxy:
       secure: true
       pathRewrite:
         '^/api/proxy/quay/api': '/'
-    
-  '/argocd/api':
-    target: https://openshift-gitops-server-openshift-gitops.${openshift_ingress_domain}/api/v1
-    changeOrigin: true
-    secure: true
-    pathRewrite:
-      '^/api/proxy/argocd/api': '/'
-    headers:
-      # inject token as env var from secret
-      Authorization: 'Bearer ${ARGOCD_AUTH_TOKEN}'
-
-    # # Plugin: Quay
-    # '/quay/api':
-    #   target: https://quay.io/
-    #   headers:
-    #     X-Requested-With: 'XMLHttpRequest'
-    #     # Uncomment the following line to access a private Quay Repository using a token
-    #     # Authorization: 'Bearer <YOUR TOKEN>'
-    #   changeOrigin: true
-    #   secure: true
 
 techdocs:
   builder: 'local'
@@ -131,9 +111,6 @@ catalog:
     ocm:
       env:
         kubernetesPluginRef: local-cluster
-
-# dynamicPlugins:
-#   rootDirectory: dynamic-plugins-root
 
 kubernetes:
   serviceLocatorMethod:
