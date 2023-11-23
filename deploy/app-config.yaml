@@ -57,10 +57,6 @@ integrations:
       apps:
         - $include: github-app-credentials.yaml
 
-github-org-provider:
-  id: production
-  orgUrl: https://github.com/joshgav-org
-
 proxy:
   endpoints:
     # Plugin: Quay
@@ -108,9 +104,29 @@ catalog:
   - type: url
     target: https://github.com/janus-idp/software-templates/blob/main/showcase-templates.yaml
   providers:
-    ocm:
-      env:
-        kubernetesPluginRef: local-cluster
+    ## for OCM plugin
+    # ocm:
+    #   env:
+    #     kubernetesPluginRef: local-cluster
+    ## scans orgs in GitHub and adds them to catalog
+    github:
+      ## TODO: this _must_ be named "providerId", which seems a bug
+      providerId:
+        organization: joshgav-org
+        schedule:
+          frequency:
+            minutes: 30
+          timeout:
+            minutes: 3
+    ## scans orgs in GitHub and adds users and groups to catalog
+    githubOrg:
+      default:
+        orgUrl: https://github.com/joshgav-org
+        schedule:
+          frequency:
+            minutes: 30
+          timeout:
+            minutes: 3
 
 kubernetes:
   serviceLocatorMethod:

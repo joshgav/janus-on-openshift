@@ -18,14 +18,19 @@ global:
     # an optional `pluginConfig` with plugin-specific backstage configuration, and an optional `disabled` flag to disable/enable a plugin
     # listed in `includes` files. It also includes an `integrity` field that is used to verify the plugin package [integrity](https://w3c.github.io/webappsec-subresource-integrity/#integrity-metadata-description).
     plugins:
-    # Techdocs
+    - package: ./dynamic-plugins/dist/backstage-plugin-catalog-backend-module-github-dynamic
+      disabled: false
+    - package: ./dynamic-plugins/dist/backstage-plugin-catalog-backend-module-github-org-dynamic
+      disabled: false
+    # - package: ./dynamic-plugins/dist/roadiehq-backstage-plugin-github-pull-requests
+    #   disabled: false
+    # - package: ./dynamic-plugins/dist/backstage-plugin-github-issues
+    #   disabled: false
+    # - package: ./dynamic-plugins/dist/roadiehq-backstage-plugin-github-insights
+    #   disabled: false
     - package: ./dynamic-plugins/dist/backstage-plugin-techdocs
       disabled: false
     - package: ./dynamic-plugins/dist/backstage-plugin-techdocs-backend-dynamic
-      disabled: false
-    - package: ./dynamic-plugins/dist/janus-idp-backstage-plugin-quay
-      disabled: false
-    - package: ./dynamic-plugins/dist/janus-idp-backstage-plugin-tekton
       disabled: false
     - package: ./dynamic-plugins/dist/roadiehq-backstage-plugin-argo-cd-backend-dynamic
       disabled: false
@@ -36,6 +41,12 @@ global:
     - package: ./dynamic-plugins/dist/backstage-plugin-kubernetes-backend-dynamic
       disabled: false
     - package: ./dynamic-plugins/dist/backstage-plugin-kubernetes
+      disabled: false
+    - package: ./dynamic-plugins/dist/janus-idp-backstage-plugin-quay
+      disabled: false
+    - package: ./dynamic-plugins/dist/janus-idp-backstage-plugin-tekton
+      disabled: false
+    - package: ./dynamic-plugins/dist/janus-idp-backstage-plugin-topology
       disabled: false
 
   # -- Enable service authentication within Backstage instance
