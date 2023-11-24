@@ -80,7 +80,11 @@ techdocs:
 auth:
   environment: development
   # see https://backstage.io/docs/auth/ to learn about auth providers
-  providers: {}
+  providers:
+    github:
+      development:
+        clientId: ${GITHUB_APP_CLIENT_ID}
+        clientSecret: ${GITHUB_APP_CLIENT_SECRET}
 
 scaffolder: {}
 

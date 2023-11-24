@@ -2,15 +2,12 @@
 
 Installation of Janus, upstream of Red Hat Developer Hub.
 
-Set environment variables in `./.env` then deploy with `./deploy/deploy.sh`.
-
-Because the GitHub modules are enabled you'll need to enable GitHub auth. To do
-so create a GitHub app as described in [this upstream
-doc](https://backstage.io/docs/integrations/github/github-apps/) and create a
-file in this directory named `github-app-credentials.yaml` as described in that
-doc.
-
-The file `github-app-credentials.yaml.tpl` is meant as an example at the moment.
+- Set environment variables in `./.env` then deploy with `./deploy/deploy.sh`.
+- For the `GITHUB_APP_CLIENT_ID` and `GITHUB_APP_CLIENT_SECRET` env vars, use the values generated for the app in the following step.
+- GitHub auth should be enabled. To do so create a GitHub org and app as
+  described in [this upstream doc](https://backstage.io/docs/integrations/github/github-apps/) and create a
+  file in the `./deploy` directory named `github-app-credentials.yaml` as described in that doc.
+- The file `github-app-credentials.yaml.tpl` is provided as an example.
 
 
 ## Tips

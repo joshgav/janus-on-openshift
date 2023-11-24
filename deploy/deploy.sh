@@ -48,7 +48,13 @@ for file in $(ls ${this_dir}/base/*.yaml); do
     ## hack: exclude files that have been entirely commented out
     lines=$(cat ${file} | awk '/^[^#].*$/ {print}' | wc -l)
     if [[ ${lines} > 0 ]]; then
-        cat ${file} | envsubst '${bs_app_name} ${ARGOCD_AUTH_TOKEN} ${GITHUB_TOKEN} ${QUAY_TOKEN} ${registry_hostname}' | kubectl apply -f -
+        cat ${file} | envsubst '${bs_app_name}
+                                ${ARGOCD_AUTH_TOKEN}
+                                ${GITHUB_TOKEN}
+                                ${QUAY_TOKEN}
+                                ${registry_hostname}
+                                ${GITHUB_APP_CLIENT_ID}
+                                ${GITHUB_APP_CLIENT_SECRET}' | kubectl apply -f -
     fi
 done
 
@@ -59,7 +65,10 @@ if [[ -e "${file_path}" ]]; then
     kubectl delete configmap custom-backstage-app-config 2> /dev/null
 
     tmpfile=$(mktemp)
-    cat "${file_path}" | envsubst '${bs_app_name} ${quay_user_name} ${openshift_ingress_domain} ${registry_hostname}' > ${tmpfile}
+    cat "${file_path}" | envsubst '${bs_app_name}
+                                   ${quay_user_name}
+                                   ${openshift_ingress_domain}
+                                   ${registry_hostname}' > ${tmpfile}
     kubectl create configmap custom-backstage-app-config \
         --from-file "$(basename ${file_path})=${tmpfile}"
 else
