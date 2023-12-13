@@ -9,17 +9,13 @@ upstream:
     app: janus
     app.kubernetes.io/name: janus
   backstage:
-    installDir: /opt/app-root/src
-    ## HACK: attempt to override upstream (see also end of deploy.sh)
-    appConfig: {}
+    appConfig: null
     image:
       registry: ${registry_hostname}
       repository: ${image_url_path}
       tag: ${image_tag}
     podAnnotations:
       instrumentation.opentelemetry.io/inject-nodejs: "true"
-      checksum/dynamic-plugins: >-
-        {{- include "common.tplvalues.render" ( dict "value" .Values.global.dynamic "context" $) | sha256sum }}
     extraAppConfig:
     - configMapRef: custom-backstage-app-config
       filename: app-config.yaml
@@ -77,23 +73,3 @@ upstream:
     extraEnvVars:
     - name: PGSSLMODE
       value: "require"
-    readinessProbe:
-      failureThreshold: 3
-      httpGet:
-        path: /healthcheck
-        port: 7007
-        scheme: HTTP
-      initialDelaySeconds: 30
-      periodSeconds: 10
-      successThreshold: 1
-      timeoutSeconds: 2
-    livenessProbe:
-      failureThreshold: 3
-      httpGet:
-        path: /healthcheck
-        port: 7007
-        scheme: HTTP
-      initialDelaySeconds: 60
-      periodSeconds: 10
-      successThreshold: 1
-      timeoutSeconds: 2

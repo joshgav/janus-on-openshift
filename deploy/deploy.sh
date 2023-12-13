@@ -11,7 +11,7 @@ export bs_app_name=${1:-${BS_APP_NAME:-rhdh}}
 export quay_user_name=${2:-${QUAY_USER_NAME:-${USER}}}
 export openshift_ingress_domain=$(oc get ingresses.config.openshift.io cluster -ojson | jq -r .spec.domain)
 
-export upstream_image_url=quay.io/rhdh/rhdh-hub-rhel9:next
+export upstream_image_url=quay.io/rhdh/rhdh-hub-rhel9:1.0
 
 export registry_hostname=${REGISTRY_HOSTNAME:-quay.io}
 export image_url_path=${quay_user_name}/${bs_app_name}-backstage
@@ -43,8 +43,8 @@ fi
 oc adm policy add-scc-to-user --serviceaccount=default privileged
 oc adm policy add-cluster-role-to-user --serviceaccount=default view
 
-echo "INFO: apply resources from ${this_dir}/base/*.yaml"
-for file in $(ls ${this_dir}/base/*.yaml); do
+echo "INFO: apply resources from ${this_dir}/resources/*.yaml"
+for file in $(ls ${this_dir}/resources/*.yaml); do
     ## hack: exclude files that have been entirely commented out
     lines=$(cat ${file} | awk '/^[^#].*$/ {print}' | wc -l)
     if [[ ${lines} > 0 ]]; then
@@ -80,6 +80,19 @@ if [[ -e ${github_app_creds_path} ]]; then
     echo "INFO: applying github-app-credentials.yaml as a secret"
     kubectl delete secret github-app-credentials 2> /dev/null
     kubectl create secret generic github-app-credentials --from-file=${github_app_creds_path}
+elif [[ -n "${GITHUB_APP_ID}" ]]; then
+    echo "INFO: using env vars for GITHUB_APP metadata"
+    cat ${this_dir}/github-app-credentials.yaml.tpl | \
+        envsubst '
+            ${GITHUB_APP_ID}
+            ${GITHUB_APP_CLIENT_ID}
+            ${GITHUB_APP_CLIENT_SECRET}
+            ${GITHUB_APP_WEBHOOK_URL}
+            ${GITHUB_APP_WEBHOOK_SECRET}
+            ${GITHUB_APP_PRIVATE_KEY}
+        ' > ${this_dir}/github-app-credentials.yaml
+    kubectl delete secret github-app-credentials 2> /dev/null
+    kubectl create secret generic github-app-credentials --from-file=${github_app_creds_path}
 fi
 
 oc get clusterrolebinding backstage-backend-k8s &> /dev/null
@@ -107,10 +120,6 @@ done
 
 echo "INFO: using chart values flags: ${chart_values}"
 helm upgrade --install ${bs_app_name} janus/backstage ${chart_values}
-
-## HACK: patch out custom app-config installed by Janus intermediate chart
-oc patch configmap ${bs_app_name}-backstage-app-config -p "{\"data\": { \"app-config.yaml\": \"{}\" }}"
-
 oc rollout restart deployment ${bs_app_name}-backstage
 
 echo "INFO: Visit your Backstage instance at https://backstage-${bs_app_name}.${openshift_ingress_domain}/"
